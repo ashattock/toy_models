@@ -26,8 +26,9 @@ plot_model_results = function() {
   
   # Plot datatable - disease states
   state_dt = results_dt %>%
+    select(time, s, i, r, model) %>%
     # Melt to tidy format...
-    pivot_longer(cols = -c(model, time), 
+    pivot_longer(cols = -c(time, model), 
                  names_to = "state") %>%
     # Set plotting order (S, I, R)....
     mutate(state = fct_inorder(state)) %>%
@@ -50,15 +51,24 @@ plot_model_results = function() {
   # ---- Key metrics -----
   
   # Plot datatable - prevalence
-  prevalence_dt = results_dt %>%
-    mutate(prev = i / (s + i + r))
+  metrics_dt = results_dt %>%
+    select(-s, -i, -r) %>%
+    # Melt to tidy format...
+    pivot_longer(cols = -c(time, model), 
+                 names_to = "metric") %>%
+    arrange(model, metric, time) %>%
+    as.data.table()
   
   # Plot prevalence states over time
-  g2 = ggplot(prevalence_dt) + 
+  g2 = ggplot(metrics_dt) + 
     aes(x = time, 
-        y = prev, 
+        y = value, 
         linetype = model) + 
-    geom_line()
+    geom_line() + 
+    # Facet by metric...
+    facet_wrap(
+      facets = vars(metric), 
+      scales = "free_y")
   
   # Save figure to file
   save_fig(g2, "Epi metrics")
