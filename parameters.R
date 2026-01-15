@@ -19,7 +19,7 @@ load_model_parameters = function() {
   p$time = 720
   
   # Number of people in population
-  p$N = 1000
+  p$N = 10000
   
   # ---- Initial conditions ----
   
@@ -32,15 +32,15 @@ load_model_parameters = function() {
   p$beta = 0.02
   
   # Number of daily contacts
-  p$n = 10
+  p$n = 6
   
   # ---- Disease state durations ----
   
   # Number of days infected
-  p$duration_infection = 10
+  p$duration_infection = 60
   
   # Number of days with immunity
-  p$duration_immunity = 30
+  p$duration_immunity = 5
   
   return(p)
 }

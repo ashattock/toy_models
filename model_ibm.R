@@ -11,6 +11,12 @@ model_ibm = function(p) {
   
   message(" > Running individual-based model")
   
+  # Start timer
+  time_taken = tic()
+  
+  # Set random number generator seed if you want
+  set.seed(100)
+  
   # ---- Initial set up ----
   
   # Randomly sample ages - would want to inform this with demographic data
@@ -21,16 +27,16 @@ model_ibm = function(p) {
     id    = 1 : p$N, 
     # age   = ages, 
     state = "S",
-    when  = as.integer(NA),  # When change in disease state occured
-    count = as.integer(0))   # Count of number of previous infections
+    when  = as.integer(NA))  # When change in disease state occured
+    # count = as.integer(0))   # Count of number of previous infections
   
   # Who is initially infected
   init_inf_id = sample.int(p$N, p$i0)
   
   # Start those people infected
   ppl[init_inf_id, state := "I"]
-  ppl[init_inf_id, when  := 1]
-  ppl[init_inf_id, count := count + 1]
+  ppl[init_inf_id, when  := 0]
+  # ppl[init_inf_id, count := count + 1]
   
   # ---- Create network ----
   
@@ -52,6 +58,7 @@ model_ibm = function(p) {
   # Iterate through daily time steps
   for (t in 1 : p$time) {
     
+    # Create copy of main people datatable
     ppl_t = data.table::copy(ppl)
     
     # ---- Susceptible to infected ----
@@ -60,7 +67,7 @@ model_ibm = function(p) {
     exposures = network %>%
       filter(from %in% ppl[state == "I", id], 
              to   %in% ppl[state == "S", id])
-      
+    
     # Identify those becoming infected in this time step
     transmission_id = exposures %>%
       # Probability of transmission in each contact...
@@ -73,10 +80,10 @@ model_ibm = function(p) {
       slice_head(n = 1, by = to) %>%
       pull(to)
       
-    # Give those people an infection
+    # Give those people an infection (in the following timestep)
     ppl_t[transmission_id, state := "I"]
     ppl_t[transmission_id, when  := t]
-    ppl_t[transmission_id, count := count + 1]
+    # ppl_t[transmission_id, count := count + 1]
     
     # ---- People recovering ----
     
@@ -129,6 +136,9 @@ model_ibm = function(p) {
   
   # Save results to file
   saveRDS(results_dt, "results_ibm.rds")
+  
+  # Finish timer and report time
+  toc(time_taken)
 }
 
 # ---------------------------------------------------------

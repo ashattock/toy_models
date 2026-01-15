@@ -47,7 +47,8 @@ packages = c(
   "tidyverse",     # Includes ggplot2, dplyr, tidyr (www.tidyverse.org/packages/)
   "data.table",    # Next generation dataframes
   "tidygraph",     # Easily create simple networks
-  "progress")      # Stylish progress bars
+  "progress",      # Stylish progress bars
+  "tictoc")        # Easy timing functionality
 
 # ---- Install and/or load packages with pacman ----
 

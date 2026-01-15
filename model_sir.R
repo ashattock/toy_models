@@ -11,6 +11,9 @@ model_sir = function(p) {
   
   message(" > Running population-based model")
   
+  # Start timer
+  time_taken = tic()
+  
   # ---- Initial set up ----
   
   # Preallocate disease state vectors
@@ -66,5 +69,8 @@ model_sir = function(p) {
   
   # Save results to file
   saveRDS(results_dt, "results_sir.rds")
+  
+  # Finish timer and report time
+  toc(time_taken)
 }
 
